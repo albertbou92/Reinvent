@@ -16,6 +16,7 @@ def process_pytorch_results(path):
     # Filter data
     data = data[data["molecule"] != "invalid_smile"]
     data = data[data["molecule"].duplicated() == False]
+    data = data[data["r"] > 0.0]
 
     return data
 
@@ -28,6 +29,7 @@ def process_libinvent_results(path):
 
     # Filter data
     data = data[data["SMILES"].duplicated() == False]
+    data = data[data["total_score"] > 0.4]
 
     return data
 
@@ -44,5 +46,5 @@ if __name__ == "__main__":
 
     generate_comparison(
         pytorchrl_path="/tmp/genchem_ppo_3/",
-        libinvent_path="/home/abou/REINVENT_RL_QSAR_demo",
+        libinvent_path="/home/abou/REINVENT_RL_QSAR_demo_1",
     )

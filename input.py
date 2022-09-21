@@ -16,7 +16,7 @@ parser.add_argument(
     help='Path to basic configuration for Reinvent environment.'
 )
 parser.add_argument(
-    'run_config', type=str,
+    '--run_config', type=str,
     help='Path to configuration json file for this run.'
 )
 
