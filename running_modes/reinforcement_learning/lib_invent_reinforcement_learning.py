@@ -24,6 +24,7 @@ class LibInventReinforcementLearning(BaseRunningMode):
         self.logger = logger
         self.learning_strategy = learning_strategy
         self.scoring_strategy = scoring_strategy
+        self.max_time = 3600
 
     def _double_single_scaffold_hack(self, configuration: LibInventReinforcementLearningConfiguration) -> LibInventReinforcementLearningConfiguration:
         # trick to address the problem that the model requires a list of scaffolds.
@@ -43,7 +44,10 @@ class LibInventReinforcementLearning(BaseRunningMode):
             actor_nlls, critic_nlls, augmented_nlls = self._updating(sampled_sequences, score_summary.total_score)
             # 4. Logging
             self._logging(start_time, step, score_summary, actor_nlls, critic_nlls, augmented_nlls)
-        self.scoring_strategy.save_filter_memory()
+
+            if (time.time() - start_time) > self.max_time:
+                self.scoring_strategy.save_filter_memory()
+                break
 
     def _sampling(self) -> List[SampledSequencesDTO]:
         sampling_action = LibInventSampleModel(self.actor, self.configuration.batch_size, self.logger,
