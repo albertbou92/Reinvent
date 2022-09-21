@@ -52,6 +52,8 @@ class LocalBondLinkReinforcementLogger(BaseReinforcementLogger):
 
             if score_summary.profile[i].name == "Custom alerts":
                 score_summary.profile[i].name = "custom_alerts"
+            if score_summary.profile[i].name == "reaction_filter":
+                score_summary.profile[i].name = "reaction_scores"
 
             wandb_info.update({score_summary.profile[i].name: np.mean(score_summary.profile[i].score)})
 

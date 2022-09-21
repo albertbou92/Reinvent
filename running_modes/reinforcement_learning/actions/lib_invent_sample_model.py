@@ -38,8 +38,7 @@ class LibInventSampleModel(BaseAction):
         """
         scaffold_list = self._randomize_scaffolds(scaffold_list) if self._randomize else scaffold_list
         clean_scaffolds = [self._attachment_points.remove_attachment_point_numbers(scaffold) for scaffold in scaffold_list]
-        dataset = md.Dataset(clean_scaffolds, self.model.get_vocabulary().scaffold_vocabulary,
-                             self.model.get_vocabulary().scaffold_tokenizer)
+        dataset = md.Dataset(clean_scaffolds, self.model.get_vocabulary().scaffold_vocabulary, self.model.get_vocabulary().scaffold_tokenizer)
         dataloader = tud.DataLoader(dataset, batch_size=len(dataset), shuffle=False, collate_fn=md.Dataset.collate_fn)
 
         for batch in dataloader:
