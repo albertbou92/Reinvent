@@ -1,3 +1,4 @@
+import wandb
 import numpy as np
 import torch
 from reinvent_chemistry.logging import fraction_valid_smiles, padding_with_invalid_smiles, \
@@ -15,6 +16,13 @@ from running_modes.reinforcement_learning.logging.link_logging.console_message i
 class LocalBondLinkReinforcementLogger(BaseReinforcementLogger):
     def __init__(self, configuration: GeneralConfigurationEnvelope, log_config: ReinforcementLoggerConfiguration):
         super().__init__(configuration, log_config)
+
+        wandb_key = "b5ef9811ad92fac918facca483c7b6caa73df290"  # configuration.logging["wandb_key"]
+        agent_name = "original_agent"  # configuration.logging["agent_name"]
+        experiment_name = "benchmarking_libinvent"  # configuration.logging["experiment_name"]
+        wandb.login(key=str(wandb_key))
+        wandb.init(project=experiment_name, name=agent_name, mode="online")
+
         self._summary_writer = SummaryWriter(log_dir=self._log_config.logging_path)
         # _rows and _columns define the shape of the output grid of molecule images in tensorboard.
         self._rows = 4
@@ -29,12 +37,26 @@ class LocalBondLinkReinforcementLogger(BaseReinforcementLogger):
     def timestep_report(self, start_time, n_steps, step, score_summary: FinalSummary,
                         agent_likelihood: torch.tensor, prior_likelihood: torch.tensor,
                         augmented_likelihood: torch.tensor, diversity_filter, actor):
-        message = self._console_message_formatter.create(start_time, n_steps, step, score_summary,
-                                                         agent_likelihood, prior_likelihood,
-                                                         augmented_likelihood)
+
+        message = self._console_message_formatter.create(
+            start_time, n_steps, step, score_summary, agent_likelihood, prior_likelihood, augmented_likelihood)
+
         self._logger.info(message)
-        self._tensorboard_report(step, score_summary, agent_likelihood, prior_likelihood, augmented_likelihood,
-                                 diversity_filter)
+
+        wandb_info = {
+            "valid_smile": fraction_valid_smiles(score_summary.scored_smiles),
+            "Number of SMILES found": diversity_filter.number_of_smiles_in_memory(),
+            "TrainReward": np.mean(score_summary.total_score)}
+
+        for i, log in enumerate(score_summary.profile):
+
+            if score_summary.profile[i].name == "Custom alerts":
+                score_summary.profile[i].name = "custom_alerts"
+
+            wandb_info.update({score_summary.profile[i].name: np.mean(score_summary.profile[i].score)})
+
+        wandb.log(wandb_info, step=step)
+
         self.save_checkpoint(step, diversity_filter, actor)
 
     def _tensorboard_report(self, step, score_summary: FinalSummary, agent_likelihood, prior_likelihood,
@@ -50,9 +72,11 @@ class LocalBondLinkReinforcementLogger(BaseReinforcementLogger):
             "agent": agent_likelihood.var()
         }, step)
         mean_score = np.mean(score_summary.total_score)
+
         for i, log in enumerate(score_summary.profile):
-            self._summary_writer.add_scalar(score_summary.profile[i].name, np.mean(score_summary.profile[i].score),
-                                            step)
+            self._summary_writer.add_scalar(
+                score_summary.profile[i].name, np.mean(score_summary.profile[i].score), step)
+
         self._summary_writer.add_scalar("Valid SMILES", fraction_valid_smiles(score_summary.scored_smiles), step)
         self._summary_writer.add_scalar("Number of SMILES found", diversity_filter.number_of_smiles_in_memory(), step)
         self._summary_writer.add_scalar("Average score", mean_score, step)
