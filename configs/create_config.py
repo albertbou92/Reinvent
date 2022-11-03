@@ -31,8 +31,8 @@ configuration["logging"] = {
 configuration["parameters"] = {}
 
 configuration["parameters"] = {
-    "actor": os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "models/agents_prior/library_design.prior"),
-    "critic": os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "models/agents_prior/library_design.prior"),
+    "actor": os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "models/agent_priors/library_design.prior"),
+    "critic": os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "models/agent_priors/library_design.prior"),
     "scaffolds": ["[*:0]N1CCN(CC1)CCCCN[*:1]"],
     "n_steps": 100,
     "learning_rate": 0.0001,
