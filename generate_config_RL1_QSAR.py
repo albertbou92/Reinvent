@@ -94,7 +94,7 @@ scoring_function = {
             "name": "DRD2",
             "weight": 1,
             "specific_parameters": {
-                "model_path": os.path.join(ipynb_path, "models/drd2.pkl"),
+                "model_path": os.path.join(ipynb_path, "models/scoring/drd2.pkl"),
                 "scikit": "classification",
                 "descriptor_type": "ecfp",
                 "size": 2048,

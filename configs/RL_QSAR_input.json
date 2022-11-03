@@ -1,0 +1,93 @@
+{
+    "logging": {
+        "job_id": "n/a",
+        "job_name": "Reinforcement learning QSAR demo",
+        "logging_path": "/Users/abou/PycharmProjects/Reinvent/configs/progress.log",
+        "recipient": "local",
+        "result_folder": "/Users/abou/PycharmProjects/Reinvent/configs/results",
+        "sender": ""
+    },
+    "model_type": "lib_invent",
+    "parameters": {
+        "actor": "/Users/abou/PycharmProjects/Reinvent/configs/models/agents_prior/decorative.prior",
+        "batch_size": 128,
+        "critic": "/Users/abou/PycharmProjects/Reinvent/configs/models/agents_prior/decorative.prior",
+        "learning_rate": 0.0001,
+        "learning_strategy": {
+            "name": "dap",
+            "parameters": {
+                "sigma": 120
+            }
+        },
+        "n_steps": 100,
+        "randomize_scaffolds": true,
+        "scaffolds": [
+            "[*:0]N1CCN(CC1)CCCCN[*:1]"
+        ],
+        "scoring_strategy": {
+            "diversity_filter": {
+                "name": "NoFilterWithPenalty"
+            },
+            "name": "lib_invent",
+            "reaction_filter": {
+                "reactions": [],
+                "type": "selective"
+            },
+            "scoring_function": {
+                "name": "custom_sum",
+                "parallel": false,
+                "parameters": [
+                    {
+                        "component_type": "predictive_property",
+                        "name": "DRD2",
+                        "specific_parameters": {
+                            "descriptor_type": "ecfp",
+                            "model_path": "/Users/abou/PycharmProjects/Reinvent/configs/models/scoring/drd2.pkl",
+                            "radius": 3,
+                            "scikit": "classification",
+                            "size": 2048,
+                            "transformation": {
+                                "transformation_type": "no_transformation"
+                            }
+                        },
+                        "weight": 1
+                    },
+                    {
+                        "component_type": "custom_alerts",
+                        "name": "Custom alerts",
+                        "specific_parameters": {
+                            "smiles": [
+                                "[*;r8]",
+                                "[*;r9]",
+                                "[*;r10]",
+                                "[*;r11]",
+                                "[*;r12]",
+                                "[*;r13]",
+                                "[*;r14]",
+                                "[*;r15]",
+                                "[*;r16]",
+                                "[*;r17]",
+                                "[#8][#8]",
+                                "[#6;+]",
+                                "[#16][#16]",
+                                "[#7;!n][S;!$(S(=O)=O)]",
+                                "[#7;!n][#7;!n]",
+                                "C#C",
+                                "C(=[O,S])[O,S]",
+                                "[#7;!n][C;!$(C(=[O,N])[N,O])][#16;!s]",
+                                "[#7;!n][C;!$(C(=[O,N])[N,O])][#7;!n]",
+                                "[#7;!n][C;!$(C(=[O,N])[N,O])][#8;!o]",
+                                "[#8;!o][C;!$(C(=[O,N])[N,O])][#16;!s]",
+                                "[#8;!o][C;!$(C(=[O,N])[N,O])][#8;!o]",
+                                "[#16;!s][C;!$(C(=[O,N])[N,O])][#16;!s]"
+                            ]
+                        },
+                        "weight": 1
+                    }
+                ]
+            }
+        }
+    },
+    "run_type": "reinforcement_learning",
+    "version": 3
+}
