@@ -1,3 +1,6 @@
+import os
+import csv
+import json
 import wandb
 import numpy as np
 import torch
@@ -31,6 +34,10 @@ class LocalBondLinkReinforcementLogger(BaseReinforcementLogger):
         self._sf_component_enum = ScoringFunctionComponentNameEnum()
         self._console_message_formatter = ConsoleMessage()
 
+        # Metric to track
+        self.total_proposed_smiles = 0
+        self.total_valid_smiles = 0
+
     def log_message(self, message: str):
         self._logger.info(message)
 
@@ -43,10 +50,42 @@ class LocalBondLinkReinforcementLogger(BaseReinforcementLogger):
 
         self._logger.info(message)
 
+        total_num_proposed_smiles = len(score_summary.scored_smiles)
+        self.total_proposed_smiles += total_num_proposed_smiles
+
+        total_num_valid_smiles = len([smile for smile in score_summary.scored_smiles if smile != "INVALID"])
+        self.total_valid_smiles += total_num_valid_smiles
+
+        # MONITOR FILE #################################################################################################
+
+        filename = os.path.join(self._log_config.logging_path, "monitor.csv")
+        already_exists = os.path.isfile(filename)
+        self.f = open(filename, "a+")
+        if not already_exists:
+            extra_keys = ()  # TODO: define keys using score_summary
+            header = ''
+            if isinstance(header, dict):
+                header = '# {} \n'.format(json.dumps(header))
+            self.f.write(header)
+            self.f.flush()
+            self.logger = csv.DictWriter(self.f, fieldnames=('r', 'l', 't') + tuple(extra_keys))
+            self.logger.writeheader()
+        self.f.flush()
+
+        # Write all info to a .csv file
+        for smile in range(total_num_valid_smiles):
+            import ipdb; ipdb.set_trace()
+            line = {"r": 10, "l": 10, "t": 10}  # TODO: define line correctly using score_summary
+            self.logger.writerow(line)
+            self.f.flush()
+
+        ################################################################################################################
+
         wandb_info = {
             "valid_smile": fraction_valid_smiles(score_summary.scored_smiles),
             "Number of SMILES found": diversity_filter.number_of_smiles_in_memory(),
-            "TrainReward": np.mean(score_summary.total_score)}
+            "TrainReward": np.mean(score_summary.total_score),
+        }
 
         for i, log in enumerate(score_summary.profile):
 
