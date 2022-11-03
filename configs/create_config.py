@@ -16,6 +16,9 @@ configuration = {
 # add block to specify whether to run locally or not and
 # where to store the results and logging
 configuration["logging"] = {
+    "wandb_key": None,
+    "agent_name": "original_code",
+    "experiment_name": "benchmarking_libinvent",
     "sender": "",  # only relevant if "recipient" is set to "remote"
     "recipient": "local",  # either to local logging or use a remote REST-interface
     "logging_path": os.path.join(output_dir, "progress.log"),  # load this folder in tensorboard
@@ -28,8 +31,8 @@ configuration["logging"] = {
 configuration["parameters"] = {}
 
 configuration["parameters"] = {
-    "actor": os.path.join(os.path.expanduser(os.path.dirname(__file__)), "models/agents_prior/decorative.prior"),
-    "critic": os.path.join(os.path.expanduser(os.path.dirname(__file__)), "models/agents_prior/decorative.prior"),
+    "actor": os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "models/agents_prior/library_design.prior"),
+    "critic": os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "models/agents_prior/library_design.prior"),
     "scaffolds": ["[*:0]N1CCN(CC1)CCCCN[*:1]"],
     "n_steps": 100,
     "learning_rate": 0.0001,
@@ -66,7 +69,7 @@ scoring_function = {
             "name": "DRD2",
             "weight": 1,
             "specific_parameters": {
-                "model_path": os.path.join(os.path.expanduser(os.path.dirname(__file__)), "models/scoring/drd2.pkl"),
+                "model_path": os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "models/scoring/drd2.pkl"),
                 "scikit": "classification",
                 "descriptor_type": "ecfp",
                 "size": 2048,

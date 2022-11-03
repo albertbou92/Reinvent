@@ -17,9 +17,9 @@ class LocalBondLinkReinforcementLogger(BaseReinforcementLogger):
     def __init__(self, configuration: GeneralConfigurationEnvelope, log_config: ReinforcementLoggerConfiguration):
         super().__init__(configuration, log_config)
 
-        wandb_key = "b5ef9811ad92fac918facca483c7b6caa73df290"  # configuration.logging["wandb_key"]
-        agent_name = "original_agent"  # configuration.logging["agent_name"]
-        experiment_name = "benchmarking_libinvent"  # configuration.logging["experiment_name"]
+        wandb_key = configuration.logging["wandb_key"]
+        agent_name = configuration.logging["agent_name"]
+        experiment_name = configuration.logging["experiment_name"]
         wandb.login(key=str(wandb_key))
         wandb.init(project=experiment_name, name=agent_name, mode="online")
 
