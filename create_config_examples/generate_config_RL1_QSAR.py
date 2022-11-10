@@ -9,7 +9,6 @@ import tempfile
 # --------- change these path variables as required
 reinvent_dir = os.path.expanduser("/home/abou/Reinvent/")
 output_dir = os.path.expanduser("/home/abou/REINVENT_RL_QSAR_demo")
-ipynb_path = os.getcwd()
 
 # if required, generate a folder to store the results
 try:
@@ -45,8 +44,8 @@ configuration["logging"] = {
 # add the "parameters" block
 configuration["parameters"] = {}
 configuration["parameters"] = {
-    "actor": os.path.join(ipynb_path, "models/library_design.prior"),
-    "critic": os.path.join(ipynb_path, "models/library_design.prior"),
+    "actor": os.path.join(reinvent_dir, "models/agent_priors/library_design.prior"),
+    "critic": os.path.join(reinvent_dir, "models/agent_priors/library_design.prior"),
     "scaffolds": ["[*:0]N1CCN(CC1)CCCCN[*:1]"],
     "n_steps": 100000,
     "learning_rate": 0.0001,
@@ -91,7 +90,7 @@ scoring_function = {
             "name": "DRD2",
             "weight": 1,
             "specific_parameters": {
-                "model_path": os.path.join(ipynb_path, "../models/scoring/drd2.pkl"),
+                "model_path": os.path.join(reinvent_dir, "models/scoring/drd2.pkl"),
                 "scikit": "classification",
                 "descriptor_type": "ecfp",
                 "size": 2048,
