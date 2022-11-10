@@ -12,3 +12,5 @@ Then you just execute the input.py script and point it to the configuration file
 ```
 $ python python input.py --run_config ~/REINVENT_RL_QSAR_demo/RL_QSAR_input.json
 ```
+
+Logs with be created in the `logging_path`. If a wandb account key is added to `wandb_key`, data will be logged to wandb as well.
