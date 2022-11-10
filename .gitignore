@@ -4,7 +4,6 @@ package.json
 .vscode
 tags
 .idea
-/configs/config.json
 README_internal.md
 
 # Coverage.py output
