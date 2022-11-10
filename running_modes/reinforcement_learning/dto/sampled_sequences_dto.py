@@ -6,3 +6,4 @@ class SampledSequencesDTO:
     input: str
     output: str
     nll: float
+    num_tokens: int
