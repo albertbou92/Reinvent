@@ -23,8 +23,14 @@ class LocalBondLinkReinforcementLogger(BaseReinforcementLogger):
         wandb_key = configuration.logging["wandb_key"]
         agent_name = configuration.logging["agent_name"]
         experiment_name = configuration.logging["experiment_name"]
-        wandb.login(key=str(wandb_key))
-        wandb.init(project=experiment_name, name=agent_name, mode="online")
+        if wandb_key != "":
+            mode = "online"
+            wandb.login(key=str(wandb_key))
+            os.environ["WANDB_CONFIG_DIR"] = self._log_config.logging_path
+            os.environ["WANDB_DIR"] = self._log_config.logging_path
+        else:
+            mode = "disabled"
+        wandb.init(project=experiment_name, name=agent_name, mode=mode)
 
         self._summary_writer = SummaryWriter(log_dir=self._log_config.logging_path)
         # _rows and _columns define the shape of the output grid of molecule images in tensorboard.
@@ -37,6 +43,7 @@ class LocalBondLinkReinforcementLogger(BaseReinforcementLogger):
         # Metric to track
         self.total_proposed_smiles = 0
         self.total_valid_smiles = 0
+        self.logger_created = False
 
     def log_message(self, message: str):
         self._logger.info(message)
@@ -58,24 +65,32 @@ class LocalBondLinkReinforcementLogger(BaseReinforcementLogger):
 
         # MONITOR FILE #################################################################################################
 
-        filename = os.path.join(self._log_config.logging_path, "monitor.csv")
-        already_exists = os.path.isfile(filename)
-        self.f = open(filename, "a+")
-        if not already_exists:
-            extra_keys = ()  # TODO: define keys using score_summary
+        if not self.logger_created:
+            filename = os.path.join(self._log_config.logging_path, "monitor.csv")
+            self.f = open(filename, "a+")
+            extra_keys = ["smile", "r"]
+            for component in score_summary.profile:
+                extra_keys.append(component.name)
+            extra_keys = tuple(extra_keys)
             header = ''
             if isinstance(header, dict):
                 header = '# {} \n'.format(json.dumps(header))
             self.f.write(header)
             self.f.flush()
-            self.logger = csv.DictWriter(self.f, fieldnames=('r', 'l', 't') + tuple(extra_keys))
+            self.logger = csv.DictWriter(self.f, fieldnames=('r', 'l') + tuple(extra_keys))
             self.logger.writeheader()
+            self.logger_created = True
         self.f.flush()
 
         # Write all info to a .csv file
-        for smile in range(total_num_valid_smiles):
-            import ipdb; ipdb.set_trace()
-            line = {"r": 10, "l": 10, "t": 10}  # TODO: define line correctly using score_summary
+        for n in range(total_num_valid_smiles):
+            line = {
+                "r": score_summary.total_score[n],
+                "smile": score_summary.scored_smiles[n],
+                "l": len(score_summary.scored_smiles[n]),
+            }
+            for component in score_summary.profile:
+                line.update({component.name: component.score[n]})
             self.logger.writerow(line)
             self.f.flush()
 

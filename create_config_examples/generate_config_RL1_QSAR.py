@@ -28,25 +28,22 @@ configuration = {
 
 ########################################################################################################################
 
-# add block to specify whether to run locally or not and
-# where to store the results and logging
 configuration["logging"] = {
+    "wandb_key": "",
+    "agent_name": "original_code",
+    "experiment_name": "benchmarking_libinvent",
     "sender": "",  # only relevant if "recipient" is set to "remote"
     "recipient": "local",  # either to local logging or use a remote REST-interface
-    "logging_path": os.path.join(output_dir, "progress.log"),  # load this folder in tensorboard
-    "result_folder": os.path.join(output_dir, "results"),  # output directory for results
+    "logging_path": output_dir,  # load this folder in tensorboard
+    "result_folder": output_dir,  # output directory for results
     "job_name": "Reinforcement learning QSAR demo",  # set an arbitrary job name for identification
-    "job_id": "n/a",  # only relevant if "recipient" is set to "remote"
-    "wandb_key": "XXXXXXXXXXX",
-    "agent_name": "original_code",
-    "experiment_name": "Benchmarking_Libinvent",
+    "job_id": "n/a"  # only relevant if "recipient" is set to "remote"
 }
 
 ########################################################################################################################
 
 # add the "parameters" block
 configuration["parameters"] = {}
-
 configuration["parameters"] = {
     "actor": os.path.join(ipynb_path, "models/library_design.prior"),
     "critic": os.path.join(ipynb_path, "models/library_design.prior"),
@@ -66,7 +63,7 @@ configuration["parameters"] = {
 ########################################################################################################################
 
 configuration["parameters"]["scoring_strategy"] = {
-    "name": "lib_invent" # Do not change
+    "name": "lib_invent"  # Do not change
 }
 
 ########################################################################################################################
@@ -94,7 +91,7 @@ scoring_function = {
             "name": "DRD2",
             "weight": 1,
             "specific_parameters": {
-                "model_path": os.path.join(ipynb_path, "models/scoring/drd2.pkl"),
+                "model_path": os.path.join(ipynb_path, "../models/scoring/drd2.pkl"),
                 "scikit": "classification",
                 "descriptor_type": "ecfp",
                 "size": 2048,
